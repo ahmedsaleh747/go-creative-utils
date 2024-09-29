@@ -67,3 +67,7 @@ This method is called before creating/updating a model to possible modify the fi
 ## Call security.ConfigureJWT([]byteP{})
 ## Have a dashboard page to redrect to once login is successful
 ## Should define a nav_bar as a template
+
+
+# Build
+GOOS=linux GOARCH=amd64 go build -o build/go-creative-utils
