@@ -20,6 +20,7 @@ var err error
 
 //goland:noinspection SpellCheckingInspection
 func InitDatabaseModels(dsn string, models []interface{}) {
+	log.Printf("Configuring db connection for %d models ...", len(models))
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
