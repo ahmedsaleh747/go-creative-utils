@@ -199,10 +199,11 @@ func GetRecordById[R Model](record *R, id string) error {
 	if cleanedId := callFunction(record, "CleanId", reflect.ValueOf(id)); cleanedId != "" {
 		id = cleanedId
 	}
+	tempDb := db
 	if condition := callFunction(record, "PreFetchConditions"); condition != "" {
-		db = db.Where(condition)
+		tempDb = tempDb.Where(condition)
 	}
-	return db.First(record, id).Error
+	return tempDb.First(record, id).Error
 }
 
 func CreateRecord[R Model](c *gin.Context, record *R) {
