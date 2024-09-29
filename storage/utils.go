@@ -185,25 +185,21 @@ func getModelRecords[R Model](db *gorm.DB, query string, page int, pageSize int,
 func GetRecord[R Model](c *gin.Context, record *R) {
 	id := c.Param("id")
 
-	tempDb := db
-	if condition := callFunction(record, "PreFetchConditions"); condition != "" {
-		tempDb = tempDb.Where(condition)
-	}
-	if err := GetRecordById(record, tempDb, id); err != nil {
+	if err := GetRecordById(record, id); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
 		return
 	}
 	c.JSON(http.StatusOK, record)
 }
 
-func GetRecordById[R Model](record *R, tempDb *gorm.DB, id string) error {
+func GetRecordById[R Model](record *R, id string) error {
 	if cleanedId := callFunction(record, "CleanId", reflect.ValueOf(id)); cleanedId != "" {
 		id = cleanedId
 	}
-	if tempDb == nil {
-		return db.First(record, id).Error
+	if condition := callFunction(record, "PreFetchConditions"); condition != "" {
+		db = db.Where(condition)
 	}
-	return tempDb.First(record, id).Error
+	return db.First(record, id).Error
 }
 
 func CreateRecord[R Model](c *gin.Context, record *R) {
@@ -213,25 +209,25 @@ func CreateRecord[R Model](c *gin.Context, record *R) {
 		return
 	}
 	log.Println("Loaded record from request")
-	callFunction(record, "PreUpdate")
-	if err := db.Create(record).Error; err != nil {
+	if err := CreateModelRecord(record); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("Record created successfully")
 	c.JSON(http.StatusOK, record)
 }
 
-func CreateModelRecord[R Model](record *R) (err error) {
+func CreateModelRecord[R Model](record *R) error {
 	callFunction(record, "PreUpdate")
-	err = db.Create(record).Error
+	if err := db.Create(record).Error; err != nil {
+		return err
+	}
 	log.Println("Record created successfully")
-	return
+	return nil
 }
 
 func UpdateRecord[R Model](c *gin.Context, record *R) {
 	id := c.Param("id")
-	if err := GetRecordById(record, db, id); err != nil {
+	if err := GetRecordById(record, id); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
 		return
 	}
@@ -239,15 +235,20 @@ func UpdateRecord[R Model](c *gin.Context, record *R) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	PersistRecord(record)
+	if err := PersistRecord(record); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, record)
 }
 
-func PersistRecord[R Model](record *R) (err error) {
+func PersistRecord[R Model](record *R) error {
 	callFunction(record, "PreUpdate")
-	err = db.Save(record).Error
+	if err := db.Save(record).Error; err != nil {
+		return err
+	}
 	log.Println("Record updated successfully")
-	return
+	return nil
 }
 
 func DeleteRecord[R Model](c *gin.Context, record *R) {
