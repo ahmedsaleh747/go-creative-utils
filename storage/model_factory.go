@@ -28,8 +28,8 @@ func extractModelConfig(model interface{}, title string, apiUrl string) {
 		field := modelType.Field(i)
 
 		//Don't consider the primary key
-		fieldZad := field.Tag.Get("zad")
-		if strings.Contains(fieldZad, "hidden") {
+		fieldExtras := field.Tag.Get("extras")
+		if strings.Contains(fieldExtras, "hidden") {
 			continue
 		}
 
@@ -45,46 +45,46 @@ func extractModelConfig(model interface{}, title string, apiUrl string) {
 			"name":  fieldName,
 			"label": field.Name,
 		}
-		if strings.Contains(fieldZad, "optional") {
+		if strings.Contains(fieldExtras, "optional") {
 			fieldInfo["optional"] = true
 		}
-		if strings.Contains(fieldZad, "block") {
+		if strings.Contains(fieldExtras, "block") {
 			fieldInfo["block"] = true
 		}
-		if strings.Contains(fieldZad, "chartData") {
+		if strings.Contains(fieldExtras, "chartData") {
 			fieldInfo["chartData"] = true
 		}
-		if strings.Contains(fieldZad, "tags") {
+		if strings.Contains(fieldExtras, "tags") {
 			fieldInfo["tags"] = true
 		}
-		if strings.Contains(fieldZad, "short-span") {
+		if strings.Contains(fieldExtras, "short-span") {
 			fieldInfo["short-span"] = true
 		}
-		if strings.Contains(fieldZad, "masterSelector") {
-			if configValue, ok := getFieldConfigValue(fieldZad, "masterSelector:"); ok {
+		if strings.Contains(fieldExtras, "masterSelector") {
+			if configValue, ok := getFieldConfigValue(fieldExtras, "masterSelector:"); ok {
 				fieldInfo["masterSelector"] = configValue
 			}
 		}
-		if strings.Contains(fieldZad, "href") {
-			if configValue, ok := getFieldConfigValue(fieldZad, "href:"); ok {
+		if strings.Contains(fieldExtras, "href") {
+			if configValue, ok := getFieldConfigValue(fieldExtras, "href:"); ok {
 				fieldInfo["href"] = configValue
 			}
 		}
-		if strings.Contains(fieldZad, "enum") {
-			if configValue, ok := getFieldConfigValue(fieldZad, "enum:"); ok {
+		if strings.Contains(fieldExtras, "enum") {
+			if configValue, ok := getFieldConfigValue(fieldExtras, "enum:"); ok {
 				fieldInfo["type"] = "select"
 				fieldInfo["allowedValues"] = strings.Split(configValue, "|")
 			}
 		}
 
 		fieldGorm := field.Tag.Get("gorm")
-		if strings.Contains(fieldGorm, "foreignKey") || strings.Contains(fieldZad, "enum") {
+		if strings.Contains(fieldGorm, "foreignKey") || strings.Contains(fieldExtras, "enum") {
 			if configValue, ok := getFieldConfigValue(fieldGorm, "foreignKey:"); ok {
 				fieldInfo["name"] = configValue
 			}
 
 			fieldInfo["type"] = "select"
-			if strings.Contains(fieldZad, "enum") {
+			if strings.Contains(fieldExtras, "enum") {
 				fieldInfo["selectorOf"] = "enum"
 			} else {
 				fieldInfo["selectorOf"] = field.Type.Name()
@@ -94,7 +94,7 @@ func extractModelConfig(model interface{}, title string, apiUrl string) {
 			// Determine the type for JSON schema
 			switch field.Type.Kind() {
 			case reflect.String:
-				if strings.Contains(fieldZad, "sensitive") {
+				if strings.Contains(fieldExtras, "sensitive") {
 					fieldInfo["type"] = "password"
 				} else {
 					fieldInfo["type"] = "text"

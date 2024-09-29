@@ -19,7 +19,7 @@ var db *gorm.DB
 var err error
 
 //goland:noinspection SpellCheckingInspection
-func InitDatabase1(dsn string, models []interface{}) {
+func InitDatabaseModels(dsn string, models []interface{}) {
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
