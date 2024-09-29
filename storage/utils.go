@@ -32,6 +32,8 @@ func InitDatabaseModels(dsn string, models []interface{}) {
 		return
 	}
 
+	models = append(models, &User{})
+	models = append(models, &Subscription{})
 	for _, model := range models {
 		AddConfig(model)
 	}
@@ -275,7 +277,7 @@ func callFunctionGeneric(record interface{}, functionName string) string {
 	return callFunctionType(modelType, record, functionName)
 }
 
-func callFunctionSlice[R Model](records *[]R, functionName string) string {
+func callFunctionSlice[R Model](_ *[]R, functionName string) string {
 	var nilRecord *R = nil
 	return callFunction(nilRecord, functionName)
 }

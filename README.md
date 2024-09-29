@@ -62,3 +62,8 @@ Default sort while listing the output
 In case the id has a prefix in some cases like "A1", this will be called to give the developer control to lean that up before getById, update, delete operations
 ## PreUpdate
 This method is called before creating/updating a model to possible modify the fields before saving it to the db.
+
+# The module that uses this modeuls should do the following:
+## Call security.ConfigureJWT([]byteP{})
+## Have a dashboard page to redrect to once login is successful
+## Should define a nav_bar as a template

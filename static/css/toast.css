@@ -1,0 +1,46 @@
+/* Custom Toast Styles */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.toast {
+    opacity: 1;
+    background-color: #fff;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.toast-header {
+    display: block;
+}
+
+.toast-header .btn-close {
+    float: right;
+}
+
+/* Progress bar at the top of the toast */
+.toast-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background-color: #28a745; /* Default color for success */
+    transition: width 1s linear;
+}
+
+/* Different background colors for toast types */
+.toast-success {
+    border-left: 5px solid #28a745;
+}
+
+.toast-error {
+    border-left: 5px solid #dc3545;
+}
+
+.toast-info {
+    border-left: 5px solid #17a2b8;
+}
