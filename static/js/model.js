@@ -548,7 +548,7 @@ function displayFormattedValue(field, value) {
 
 function displayFormattedDate(value) {
     const date = new Date(value);
-    const formattedDate = date.toDateString('en-US', {
+    const formattedDate = date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short', // e.g., "Sep"
         day: 'numeric'  // e.g., "7"
