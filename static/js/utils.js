@@ -37,7 +37,7 @@ async function secureFetch(url, request, errorHandler) {
                 return
             }
         } else if (data != null && data.actions != undefined) {
-            data.actions.array.forEach(action => {
+            data.actions.forEach(action => {
                 executeAction(action);
             });
         }
