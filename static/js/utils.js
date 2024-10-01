@@ -33,17 +33,13 @@ async function secureFetch(url, request, errorHandler) {
     if (contentType && contentType.includes('application/json')) {
         data = await response.json();
         if (data != null && data.action != undefined) {
-            if(data.action == 'Refresh') {
-                location.reload()
-                return;
-            } else if(data.action == 'Redirect') {
-                window.open(data.url, '_blank');
-                return;
-            } else if(data.action == 'Dialog') {
-                showDialog(data)
-            } else if(data.action == 'Toast') {
-                showToast('success', 'Success!', data.message, 5000);
+            if (executeAction(data) ) {
+                return
             }
+        } else if (data != null && data.actions != undefined) {
+            data.actions.array.forEach(action => {
+                executeAction(action);
+            });
         }
     } else {
         data = await response.text();
@@ -118,6 +114,25 @@ function showToast(type, title, message, delay = 3000) {
     $toast.on('hidden.bs.toast', function () {
         $(this).remove();
     });
+}
+
+/**
+ * @param {The action details} data 
+ * @returns true to stop further execution
+ */
+function executeAction(data) {
+    if(data.action == 'Refresh') {
+        location.reload()
+        return true;
+    } else if(data.action == 'Redirect') {
+        window.open(data.url, '_blank');
+        return true;
+    } else if(data.action == 'Dialog') {
+        showDialog(data)
+    } else if(data.action == 'Toast') {
+        showToast('success', 'Success!', data.message, 5000);
+    }
+    return false;
 }
 
 async function showDialog(data) {
