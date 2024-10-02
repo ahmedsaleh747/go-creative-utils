@@ -356,7 +356,7 @@ function displaySelectField(modelRecord, field, fieldColumn, editMode) {
         return;
     }
 
-    const optionValue = value !== undefined || value == '' || field.selectorOf == null ? null
+    const optionValue = value === undefined || value == '' || field.selectorOf == null ? null
         : field.selectorOf === 'enum'
             ? new Option(value, value, true, true)
             : new Option(modelRecord[field.selectorOf].name, value, true, true);
