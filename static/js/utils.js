@@ -205,7 +205,6 @@ function selectNavigationItem() {
         if ($element.children().length > 0 || $.trim($element.html()) === "") {
             return;
         }
-        console.log($element)
         const linkPath = $element.attr('href').replace(/\/$/, '');
         if (linkPath === currentPath) {
             $element.parent().addClass('active');

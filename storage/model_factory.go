@@ -22,18 +22,44 @@ func AddConfig(model interface{}) {
 
 func extractModelConfig(model interface{}, title string, apiUrl string) {
 	modelType := reflect.TypeOf(model).Elem()
+	fields := extractModelFields(modelType)
+
+	var actions = []string{}
+	if actionsStr := callFunctionGeneric(model, "ExtraActions"); actionsStr != "" {
+		actions = strings.Split(actionsStr, ",")
+	}
+
+	log.Printf("Storing model %s configuration", modelType)
+	configJson := map[string]any{
+		"title":   title,
+		"fields":  fields,
+		"actions": actions,
+		"apiUrl":  apiUrl,
+	}
+
+	modelConfig[strings.ToLower(modelType.Name())] = configJson
+	typeRegistry[modelType.Name()] = func() interface{} { return model }
+}
+
+func extractModelFields(modelType reflect.Type) []map[string]interface{} {
 	var fields []map[string]interface{}
 
 	for i := 0; i < modelType.NumField(); i++ {
 		field := modelType.Field(i)
 
-		//Don't consider the primary key
+		if field.Anonymous {
+			embeddedType := field.Type
+			log.Printf("Embedded Field: %s, Type: %s", embeddedType.Name(), embeddedType)
+			embeddedFields := extractModelFields(embeddedType)
+			fields = append(fields, embeddedFields...)
+			continue
+		}
+
 		fieldExtras := field.Tag.Get("extras")
 		if strings.Contains(fieldExtras, "hidden") {
 			continue
 		}
 
-		//Consider the case where json tag has commas, just use the first tab value
 		fieldName := field.Tag.Get("json")
 		if strings.Contains(fieldName, ",") {
 			fieldName = strings.Split(fieldName, ",")[0]
@@ -91,7 +117,6 @@ func extractModelConfig(model interface{}, title string, apiUrl string) {
 			}
 			log.Printf("Constructing model %s configuration, field %s is a selector of %s", modelType, field.Name, fieldInfo["selectorOf"])
 		} else {
-			// Determine the type for JSON schema
 			switch field.Type.Kind() {
 			case reflect.String:
 				if strings.Contains(fieldExtras, "sensitive") {
@@ -115,22 +140,7 @@ func extractModelConfig(model interface{}, title string, apiUrl string) {
 		}
 		fields = append(fields, fieldInfo)
 	}
-
-	var actions = []string{}
-	if actionsStr := callFunctionGeneric(model, "ExtraActions"); actionsStr != "" {
-		actions = strings.Split(actionsStr, ",")
-	}
-
-	log.Printf("Storing model %s configuration", modelType)
-	configJson := map[string]any{
-		"title":   title,
-		"fields":  fields,
-		"actions": actions,
-		"apiUrl":  apiUrl,
-	}
-
-	modelConfig[strings.ToLower(modelType.Name())] = configJson
-	typeRegistry[modelType.Name()] = func() interface{} { return model }
+	return fields
 }
 
 func getFieldConfigValue(fieldConfiguration string, configPrefix string) (string, bool) {

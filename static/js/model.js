@@ -346,16 +346,16 @@ function displayField(modelRecord, field, fieldColumn, editModel) {
 }
 
 function displaySelectField(modelRecord, field, fieldColumn, editMode) {
+    const value = modelRecord == null ? '' : modelRecord[field.name];
     if (!editMode) {
         if (field.selectorOf !== 'enum') {
-            fieldColumn.text(modelRecord[field.selectorOf].name);
+            if(value != '') fieldColumn.text(modelRecord[field.selectorOf].name);
         } else {
-            fieldColumn.text(modelRecord[field.name]);
+            fieldColumn.text(value);
         }
         return;
     }
 
-    const value = modelRecord == null ? '' : modelRecord[field.name];
     const optionValue = value == '' || field.selectorOf == null ? null
         : field.selectorOf === 'enum'
             ? new Option(value, value, true, true)
@@ -533,7 +533,6 @@ function showChart(title, chartData) {
         }
     });
 
-    // Show the modal
     $('#chartModal').show();
     $('.close').on('click', function () {
         chartInstance.destroy();
