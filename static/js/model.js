@@ -349,14 +349,14 @@ function displaySelectField(modelRecord, field, fieldColumn, editMode) {
     const value = modelRecord == null ? '' : modelRecord[field.name];
     if (!editMode) {
         if (field.selectorOf !== 'enum') {
-            if(value !== undefined) fieldColumn.text(modelRecord[field.selectorOf].name);
+            if(value !== undefined && value != '') fieldColumn.text(modelRecord[field.selectorOf].name);
         } else {
             fieldColumn.text(value);
         }
         return;
     }
 
-    const optionValue = value == '' || field.selectorOf == null ? null
+    const optionValue = value !== undefined || value == '' || field.selectorOf == null ? null
         : field.selectorOf === 'enum'
             ? new Option(value, value, true, true)
             : new Option(modelRecord[field.selectorOf].name, value, true, true);
