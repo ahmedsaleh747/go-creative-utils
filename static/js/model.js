@@ -349,7 +349,7 @@ function displaySelectField(modelRecord, field, fieldColumn, editMode) {
     const value = modelRecord == null ? '' : modelRecord[field.name];
     if (!editMode) {
         if (field.selectorOf !== 'enum') {
-            if(value != '') fieldColumn.text(modelRecord[field.selectorOf].name);
+            if(value !== undefined) fieldColumn.text(modelRecord[field.selectorOf].name);
         } else {
             fieldColumn.text(value);
         }
