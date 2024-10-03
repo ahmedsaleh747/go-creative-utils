@@ -347,20 +347,22 @@ function displayField(modelRecord, field, fieldColumn, editModel) {
 
 function displaySelectField(modelRecord, field, fieldColumn, editMode) {
     const value = modelRecord == null ? '' : modelRecord[field.name];
+    const valueRecord = value === undefined || value === '' ? '' : modelRecord[field.selectorOf];
     if (!editMode) {
         if (field.selectorOf !== 'enum') {
-            if(value !== undefined && value != '') fieldColumn.text(modelRecord[field.selectorOf].name);
+            if(valueRecord !== undefined && valueRecord != '') fieldColumn.text(valueRecord.name);
         } else {
             fieldColumn.text(value);
         }
         return;
     }
 
-    const optionValue = value === undefined || value == '' || field.selectorOf == null ? null
-        : field.selectorOf === 'enum'
-            ? new Option(value, value, true, true)
-            : new Option(modelRecord[field.selectorOf].name, value, true, true);
-
+    const optionValue = field.selectorOf == null ? null :
+        field.selectorOf === 'enum' ?
+           value === undefined || value == '' ? null : 
+                new Option(value, value, true, true) :
+           valueRecord === undefined || valueRecord == '' ?  null :
+                new Option(valueRecord.name, value, true, true);
     field.allLoaded = false;
     field.loading = false;
     const fieldSelect = $('<select></select>')
