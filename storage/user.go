@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,17 +11,6 @@ type User struct {
 	Name     string `json:"username" gorm:"unique"`
 	Password string `json:"password" extras:"sensitive"`
 	Role     string `json:"role" extras:"enum:Admin|Scraper"`
-}
-
-func (user *User) MarshalJSON() ([]byte, error) {
-	type Alias User
-	return json.Marshal(&struct {
-		Password string `json:"password"` //this needs to be the same work as the field, but all lower case, to match utils
-		*Alias
-	}{
-		Password: "****",
-		Alias:    (*Alias)(user),
-	})
 }
 
 func (*User) TableName() string {
@@ -70,4 +58,9 @@ func GetUserUsingNameAndPassword(c *gin.Context) (user User) {
 		return
 	}
 	return
+}
+
+// PostLoad called by reflection
+func (record *User) PostLoad() {
+	record.Password = "****"
 }

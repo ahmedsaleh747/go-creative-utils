@@ -108,6 +108,9 @@ func GetModelRecords[R Model](c *gin.Context, records *[]R, modelTypes []string)
 	}
 
 	count, currentPage, totalPages := getModelRecords(tempDb, query, page, pageSize, records, modelTypes)
+	for _, record := range *records {
+		callFunction(&record, "PostLoad")
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"total":       count,
 		"currentPage": currentPage,
@@ -192,6 +195,7 @@ func GetRecord[R Model](c *gin.Context, record *R) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
 		return
 	}
+	callFunction(record, "PostLoad")
 	c.JSON(http.StatusOK, record)
 }
 
@@ -217,6 +221,7 @@ func CreateRecord[R Model](c *gin.Context, record *R) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	callFunction(record, "PostLoad")
 	c.JSON(http.StatusOK, record)
 }
 
@@ -243,6 +248,7 @@ func UpdateRecord[R Model](c *gin.Context, record *R) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	callFunction(record, "PostLoad")
 	c.JSON(http.StatusOK, record)
 }
 
