@@ -108,8 +108,8 @@ func GetModelRecords[R Model](c *gin.Context, records *[]R, modelTypes []string)
 	}
 
 	count, currentPage, totalPages := getModelRecords(tempDb, query, page, pageSize, records, modelTypes)
-	for _, record := range *records {
-		callFunction(&record, "PostLoad")
+	for i := range *records {
+		callFunction(&(*records)[i], "PostLoad")
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"total":       count,
