@@ -123,7 +123,7 @@ async function fetchEntries(clear) {
                 appendModelRow(modelRecord, modelRow, `${config.apiUrl}/${id}`, 'PUT');
             });
         editBtn.append($('<img>')
-            .attr("src", `https://cdn.jsdelivr.net/gh/ahmedsaleh747/go-creative-utils@v0.1.20/static/images/edit.png`)
+            .attr("src", `https://cdn.jsdelivr.net/gh/ahmedsaleh747/go-creative-utils@v0.1.23/static/images/edit.png`)
             .attr("alt", "Edit")
             .attr("style", "width: 24px; height: 24px")
         );
@@ -138,7 +138,7 @@ async function fetchEntries(clear) {
                 }
             });
         deleteBtn.append($('<img>')
-            .attr("src", `https://cdn.jsdelivr.net/gh/ahmedsaleh747/go-creative-utilsv0.1.20/static/images/delete.png`)
+            .attr("src", `https://cdn.jsdelivr.net/gh/ahmedsaleh747/go-creative-utils@v0.1.23/static/images/delete.png`)
             .attr("alt", "Delete")
             .attr("style", "width: 24px; height: 24px")
         )
