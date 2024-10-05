@@ -16,7 +16,6 @@ type IdentityClaims interface {
 
 type UserMeta struct {
 	jwt.StandardClaims
-	IdentityClaims
 	UserId   uint   `json:"userId"`
 	Username string `json:"username"`
 	Role     string `json:"role"`
