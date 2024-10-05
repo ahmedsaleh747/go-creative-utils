@@ -549,12 +549,12 @@ function displayFormattedValue(field, value) {
 
 function displayFormattedDate(value) {
     const date = new Date(value);
-    const formattedDate = date.toLocaleDateString('en-US', {
+    const formattedDate = date.toDateString('en-US', {
         year: 'numeric',
         month: 'short', // e.g., "Sep"
         day: 'numeric'  // e.g., "7"
     });
-    const formattedTime = date.toLocaleTimeString('en-US', {
+    const formattedTime = date.toTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',
         hour12: true    // Use 12-hour format
