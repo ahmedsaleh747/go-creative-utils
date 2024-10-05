@@ -51,9 +51,9 @@ func GetUserUsingNameAndPassword(c *gin.Context, user Identity) bool {
 	if err := GetDb().Where("name ILIKE ? and password = ?", requestUser.Name, requestUser.Password).
 		First(&user).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
-		return true
+		return false
 	}
-	return false
+	return true
 }
 
 // PostLoad called by reflection
