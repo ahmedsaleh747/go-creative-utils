@@ -123,7 +123,7 @@ async function fetchEntries(clear) {
                 appendModelRow(modelRecord, modelRow, `${config.apiUrl}/${id}`, 'PUT');
             });
         editBtn.append($('<img>')
-            .attr("src", `https://cdn.jsdelivr.net/gh/ahmedsaleh747/go-creative-utils@latest/static/images/edit.png`)
+            .attr("src", `https://cdn.jsdelivr.net/gh/ahmedsaleh747/go-creative-utils@v0.1.20/static/images/edit.png`)
             .attr("alt", "Edit")
             .attr("style", "width: 24px; height: 24px")
         );
@@ -138,7 +138,7 @@ async function fetchEntries(clear) {
                 }
             });
         deleteBtn.append($('<img>')
-            .attr("src", `https://cdn.jsdelivr.net/gh/ahmedsaleh747/go-creative-utils@latest/static/images/delete.png`)
+            .attr("src", `https://cdn.jsdelivr.net/gh/ahmedsaleh747/go-creative-utilsv0.1.20/static/images/delete.png`)
             .attr("alt", "Delete")
             .attr("style", "width: 24px; height: 24px")
         )
@@ -549,20 +549,24 @@ function displayFormattedValue(field, value) {
 
 function displayFormattedDate(value) {
     const date = new Date(value);
-    const formattedDate = date.toDateString('en-US', {
+    const dateOptions = {
         year: 'numeric',
         month: 'short', // e.g., "Sep"
-        day: 'numeric'  // e.g., "7"
-    });
-    const formattedTime = date.toTimeString('en-US', {
+        day: 'numeric', // e.g., "7"
+        timeZone: 'UTC'
+    };
+    const timeOptions = {
         hour: 'numeric',
         minute: '2-digit',
-        hour12: true    // Use 12-hour format
-    });
+        hour12: true,   // Use 12-hour format
+        timeZone: 'UTC' // Same timezone as above
+    };
 
-    // Create a two-line output in a span
-    const displayDateTime = `${formattedDate}\n${formattedTime}`;
-    return displayDateTime;
+    // Format the date and time with specific options
+    const formattedDate = new Intl.DateTimeFormat('en-US', dateOptions).format(date);
+    const formattedTime = new Intl.DateTimeFormat('en-US', timeOptions).format(date);
+
+    return `${formattedDate}\n${formattedTime}`;
 }
 
 //---------------------------   FIELDS END  ----------------------------------
