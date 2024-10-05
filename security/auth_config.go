@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AuthMiddleware(skipPath string) gin.HandlerFunc {
+func AuthMiddleware(claims shared.IdentityClaims, skipPath string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.Method == "POST" && c.Request.URL.Path == skipPath {
 			c.Next()
@@ -24,19 +24,18 @@ func AuthMiddleware(skipPath string) gin.HandlerFunc {
 		}
 
 		tokenStr = tokenStr[len("Bearer "):]
-		userMeta, err := VerifyToken(tokenStr)
-		if err != nil {
+		if err := VerifyToken(tokenStr, claims); err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 			c.Abort()
 			return
 		}
 
 		// Save the username in the context
-		c.Set("user", userMeta)
+		c.Set("user", claims)
 
 		//Sample code using the claims
-		user := c.MustGet("user").(*shared.UserMeta)
-		log.Printf("User: [%v:%s] calling %s", user.UserId, user.Username, c.Request.URL.Path)
+		user := c.MustGet("user").(shared.IdentityClaims)
+		log.Printf("User: [%v:%s] calling %s", user.GetUserId(), user.GetUsername(), c.Request.URL.Path)
 
 		// Pass on to the next-in-chain
 		c.Next()
@@ -84,24 +83,18 @@ func WithRoles(allowedRoles []string) gin.HandlerFunc {
 	}
 }
 
-func Login(c *gin.Context) {
-	user := storage.GetUserUsingNameAndPassword(c)
+func Login(c *gin.Context, user storage.Identity, claims shared.IdentityClaims) {
+	if !storage.GetUserUsingNameAndPassword(c, user) {
+		return
+	}
+	claims.SetClaims(user)
+	log.Printf("Login succedded for user: %s[%s]", claims.GetUsername(), claims.GetRole())
 
-	response := constructUserMeta(&user)
-	token, err := GenerateToken(&response)
+	token, err := GenerateToken(claims)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": token})
-}
-
-func constructUserMeta(user *storage.User) (response shared.UserMeta) {
-	response = shared.UserMeta{}
-	response.UserId = user.ID
-	response.Username = user.Name
-	response.Role = user.Role
-	log.Printf("Login succedded for user: %s[%s]", user.Name, response.Role)
-	return
 }

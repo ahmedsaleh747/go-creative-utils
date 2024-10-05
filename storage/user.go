@@ -6,11 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Identity interface {
+	GetId() uint
+	GetName() string
+	GetRole() string
+}
+
 type User struct {
 	ID       uint   `json:"id" gorm:"primaryKey" extras:"hidden"`
 	Name     string `json:"username" gorm:"unique"`
 	Password string `json:"password" extras:"sensitive"`
-	Role     string `json:"role" extras:"enum:Admin|Scraper"`
 }
 
 func (*User) TableName() string {
@@ -25,39 +30,30 @@ func (*User) GetApiUrl() string {
 	return "/api/user"
 }
 
-func GetUserList(c *gin.Context) {
-	var records []User
-	GetRecords(c, &records)
+func (u *User) GetId() uint {
+	return u.ID
 }
 
-func GetUser(c *gin.Context) {
-	GetRecord(c, &User{})
+func (u *User) GetName() string {
+	return u.Name
 }
 
-func CreateUser(c *gin.Context) {
-	CreateRecord(c, &User{})
+func (u *User) GetRole() string {
+	return "Unknown" //unknown role, should be overridden by the child structs
 }
 
-func UpdateUser(c *gin.Context) {
-	UpdateRecord(c, &User{})
-}
-
-func DeleteUser(c *gin.Context) {
-	DeleteRecord(c, &User{})
-}
-
-func GetUserUsingNameAndPassword(c *gin.Context) (user User) {
+func GetUserUsingNameAndPassword(c *gin.Context, user Identity) bool {
 	var requestUser User
 	if err := c.BindJSON(&requestUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
-		return
+		return false
 	}
 	if err := GetDb().Where("name ILIKE ? and password = ?", requestUser.Name, requestUser.Password).
 		First(&user).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
-		return
+		return true
 	}
-	return
+	return false
 }
 
 // PostLoad called by reflection

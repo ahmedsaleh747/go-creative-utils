@@ -19,12 +19,13 @@ func ConfigureJWT(appJwtKey []byte) {
 	jwtKey = appJwtKey
 }
 
-func GenerateToken(claims *shared.UserMeta) (string, error) {
+func GenerateToken(claims shared.IdentityClaims) (string, error) {
 	expirationTime := time.Now().Add(expirationHours * time.Hour)
-	claims.StandardClaims = jwt.StandardClaims{
-		IssuedAt:  time.Now().Unix(),
-		ExpiresAt: expirationTime.Unix(),
-	}
+	claims.SetStandardClaims(
+		jwt.StandardClaims{
+			IssuedAt:  time.Now().Unix(),
+			ExpiresAt: expirationTime.Unix(),
+		})
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
@@ -34,21 +35,20 @@ func GenerateToken(claims *shared.UserMeta) (string, error) {
 	return tokenString, nil
 }
 
-func VerifyToken(tokenString string) (*shared.UserMeta, error) {
-	claims := &shared.UserMeta{}
+func VerifyToken(tokenString string, claims shared.IdentityClaims) error {
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
 
 	if err != nil {
 		if errors.Is(err, jwt.ErrSignatureInvalid) {
-			return nil, fmt.Errorf("invalid signature")
+			return fmt.Errorf("invalid signature")
 		}
-		return nil, fmt.Errorf("error parsing token: %v", err)
+		return fmt.Errorf("error parsing token: %v", err)
 	}
 
 	if !token.Valid {
-		return nil, fmt.Errorf("invalid token")
+		return fmt.Errorf("invalid token")
 	}
-	return claims, nil
+	return nil
 }
