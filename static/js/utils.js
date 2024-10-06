@@ -136,7 +136,8 @@ function executeAction(data) {
 }
 
 async function showDialog(data) {
-    const dialogResponse = await secureFetch(`/dialog_${data.dialogId}`)
+    const urlExtras = data.id != undefined && data.id != '' ? `?id=${data.id}` : ''
+    const dialogResponse = await secureFetch(`/dialog_${data.dialogId}${urlExtras}`)
     var dialogId = data.dialogId + '-' + Date.now(); // Generate a unique ID
     const newDialog = $(dialogResponse.data)
 
