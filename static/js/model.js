@@ -332,10 +332,10 @@ function isLastPage() {
 //---------------------------   FIELDS START  ----------------------------------
 
 function displayField(modelRecord, field, fieldColumn, editModel) {
+    if (typeof displayCustomField === 'function' && displayCustomField(modelRecord, field, fieldColumn, editModel)) return
+
     if (field.type === 'select') {
         displaySelectField(modelRecord, field, fieldColumn, editModel);
-    } else if (field.chartData) {
-        displayChartField(modelRecord, field, fieldColumn, editModel);
     } else if (field.block) {
         displayBlockField(modelRecord, field, fieldColumn, editModel);
     } else if (field.tags) {
@@ -406,17 +406,6 @@ function displaySelectField(modelRecord, field, fieldColumn, editMode) {
     })
 
     fieldSelect.selectpicker('refresh');
-}
-
-function displayChartField(modelRecord, field, fieldColumn, editMode) {
-    if (editMode) return
-    const chartBtn = $('<button></button>')
-        .text("Show Chart")
-        .attr('class', 'save-btn btn btn-primary')
-        .click(async function () {
-            showChart(modelRecord['name'], modelRecord[field.name])
-        });
-    fieldColumn.append(chartBtn);
 }
 
 function displayTextField(modelRecord, field, fieldColumn, editMode) {
@@ -507,38 +496,6 @@ function displayTagField(modelRecord, field, fieldColumn, editMode) {
             .text(tag.trim())
             .attr('class', 'badge bg-info');
         fieldColumn.append(tagSpan);
-    });
-}
-
-function showChart(title, chartData) {
-    $('#chartTitle').text(title);
-
-    const ctx = document.getElementById('exerciseChart').getContext('2d');
-    const chartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: chartData.sensorData.map((_, i) => `Point ${i + 1}`),
-            datasets: [{
-                label: title,
-                data: chartData.sensorData,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 2,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {title: {display: true, text: 'Data Points'}},
-                y: {title: {display: true, text: 'Value'}}
-            }
-        }
-    });
-
-    $('#chartModal').show();
-    $('.close').on('click', function () {
-        chartInstance.destroy();
-        $('#chartModal').hide();
     });
 }
 
