@@ -148,7 +148,6 @@ async function showDialog(data) {
     const dialog = $(`#${dialogId}`)
     dialog.modal('show');
     initDialog(dialog)
-    $('.modal-backdrop').remove();
 
     const dialogForm = dialog.find(`#dialogForm`)
     dialog.find('#submitReason').on('click', async function(event) {
