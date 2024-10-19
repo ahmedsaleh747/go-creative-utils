@@ -277,7 +277,8 @@ func DeleteRecord[R Model](c *gin.Context, record *R) {
 }
 
 func getFilterValue(c *gin.Context, fieldName string) string {
-	return c.DefaultQuery(fieldName, "")
+	filterValue := c.DefaultQuery(fieldName, "")
+	return strings.TrimSpace(filterValue)
 }
 
 func callFunctionGeneric(record interface{}, functionName string) string {
