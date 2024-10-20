@@ -73,7 +73,7 @@ This method is called before creating/updating a model to possible modify the fi
 GOOS=linux GOARCH=amd64 go build -o build/go-creative-utils
 
 # Deployment (After commiting the code-changes)
-git tag v0.1.27
-git push origin v0.1.27
--> Then update the dependancies in the child projects, by searching for: utils@v0.1.27
--> Then download the new version: go get -u github.com/ahmedsaleh747/go-creative-utils@v0.1.27
+git tag v0.1.28
+git push origin v0.1.28
+-> Then update the dependancies in the child projects, by searching for: utils@v0.1.28
+-> Then download the new version: go get -u github.com/ahmedsaleh747/go-creative-utils@v0.1.28

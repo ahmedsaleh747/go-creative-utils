@@ -200,11 +200,14 @@ func GetRecord[R Model](c *gin.Context, record *R) {
 }
 
 func GetRecordById[R Model](record *R, id string) error {
-	if cleanedId := callFunction(record, "CleanId", reflect.ValueOf(id)); cleanedId != "" {
+	if id == "" {
+		return fmt.Errorf("Can't get record with empty ID")
+	}
+	if cleanedId, _ := callFunction(record, "CleanId", reflect.ValueOf(id)); cleanedId != "" {
 		id = cleanedId
 	}
 	tempDb := db
-	if condition := callFunction(record, "PreFetchConditions"); condition != "" {
+	if condition, _ := callFunction(record, "PreFetchConditions"); condition != "" {
 		tempDb = tempDb.Where(condition)
 	}
 	return tempDb.First(record, id).Error
@@ -218,7 +221,11 @@ func CreateRecord[R Model](c *gin.Context, record *R) {
 	}
 	log.Println("Loaded record from request")
 	if err := CreateModelRecord(record); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errorCode := http.StatusBadRequest
+		if strings.HasPrefix(err.Error(), "conflict") {
+			errorCode = http.StatusConflict
+		}
+		c.JSON(errorCode, gin.H{"error": err.Error()})
 		return
 	}
 	callFunction(record, "PostLoad")
@@ -226,7 +233,9 @@ func CreateRecord[R Model](c *gin.Context, record *R) {
 }
 
 func CreateModelRecord[R Model](record *R) error {
-	callFunction(record, "PreUpdate")
+	if _, err := callFunction(record, "PreUpdate"); err != nil {
+		return err
+	}
 	if err := db.Create(record).Error; err != nil {
 		return err
 	}
@@ -245,7 +254,11 @@ func UpdateRecord[R Model](c *gin.Context, record *R) {
 		return
 	}
 	if err := PersistRecord(record); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errorCode := http.StatusBadRequest
+		if strings.HasPrefix(err.Error(), "conflict") {
+			errorCode = http.StatusConflict
+		}
+		c.JSON(errorCode, gin.H{"error": err.Error()})
 		return
 	}
 	callFunction(record, "PostLoad")
@@ -253,7 +266,9 @@ func UpdateRecord[R Model](c *gin.Context, record *R) {
 }
 
 func PersistRecord[R Model](record *R) error {
-	callFunction(record, "PreUpdate")
+	if _, err := callFunction(record, "PreUpdate"); err != nil {
+		return err
+	}
 	if err := db.Save(record).Error; err != nil {
 		return err
 	}
@@ -263,7 +278,7 @@ func PersistRecord[R Model](record *R) error {
 
 func DeleteRecord[R Model](c *gin.Context, record *R) {
 	id := c.Param("id")
-	if cleanedId := callFunction(record, "CleanId", reflect.ValueOf(id)); cleanedId != "" {
+	if cleanedId, _ := callFunction(record, "CleanId", reflect.ValueOf(id)); cleanedId != "" {
 		id = cleanedId
 	}
 	if err := db.Delete(record, id).Error; err != nil {
@@ -283,20 +298,22 @@ func getFilterValue(c *gin.Context, fieldName string) string {
 
 func callFunctionGeneric(record interface{}, functionName string) string {
 	modelType := reflect.TypeOf(record)
-	return callFunctionType(modelType, record, functionName)
+	output, _ := callFunctionType(modelType, record, functionName)
+	return output
 }
 
 func callFunctionSlice[R Model](_ *[]R, functionName string) string {
 	var nilRecord *R = nil
-	return callFunction(nilRecord, functionName)
+	output, _ := callFunction(nilRecord, functionName)
+	return output
 }
 
-func callFunction[R Model](record *R, functionName string, extraParams ...reflect.Value) string {
+func callFunction[R Model](record *R, functionName string, extraParams ...reflect.Value) (outputStr string, outputErr error) {
 	modelType := reflect.TypeOf(record)
 	return callFunctionType(modelType, record, functionName, extraParams...)
 }
 
-func callFunctionType(modelType reflect.Type, record interface{}, functionName string, extraParams ...reflect.Value) string {
+func callFunctionType(modelType reflect.Type, record interface{}, functionName string, extraParams ...reflect.Value) (outputStr string, outputErr error) {
 	if method, found := modelType.MethodByName(functionName); found {
 		log.Printf("Found %s function, calling it", functionName)
 
@@ -306,8 +323,10 @@ func callFunctionType(modelType reflect.Type, record interface{}, functionName s
 
 		results := method.Func.Call(params)
 		if len(results) > 0 && results[0].Kind() == reflect.String {
-			return results[0].String()
+			outputStr = results[0].String()
+		} else if len(results) > 0 && !results[0].IsNil() && results[0].Type().Implements(reflect.TypeOf((*error)(nil)).Elem()) {
+			outputErr = results[0].Interface().(error)
 		}
 	}
-	return ""
+	return
 }
