@@ -79,3 +79,8 @@ git tag v0.1.30
 git push origin v0.1.30
 -> Then update the dependancies in the child projects, by searching for: utils@v0.1.29
 -> Then download the new version: go get -u github.com/ahmedsaleh747/go-creative-utils@v0.1.29
+
+# Git asks for username and password
+-> Use PAT (https://github.com/settings/tokens)
+git remote set-url origin https://<TOKEN>@github.com/username/repository.git
+
