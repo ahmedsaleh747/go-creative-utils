@@ -237,16 +237,16 @@ func createModelRecord[R Model](db *gorm.DB, record *R) error {
 
 func UpdateRecord[R Model](c *gin.Context, record *R) {
 	id := c.Param("id")
-	if err := GetRecordById(c, record, id); err != nil {
+    db, err := GetDb(c)
+	if err != nil {
+		return
+	}
+	if err := getRecordById(db, record, id); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
 		return
 	}
 	if err := c.ShouldBindJSON(record); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-    db, err := GetDb(c)
-	if err != nil {
 		return
 	}
 	if err := persistRecord(db, record); err != nil {

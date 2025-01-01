@@ -73,12 +73,12 @@ This method is called before creating/updating a model to possible modify the fi
 GOOS=linux GOARCH=amd64 go build -o build/go-creative-utils
 
 # Deployment (After commiting the code-changes)
--> Search for v0.1.33 version in the utils and update it
+-> Search for v0.1.34 version in the utils and update it
 -> Commit the code
-git tag v0.1.33
-git push origin v0.1.33
--> Then update the dependancies in the child projects, by searching for: utils@v0.1.33 (-1 [the old version])
--> Then download the new version: go get -u github.com/ahmedsaleh747/go-creative-utils@v0.1.33
+git tag v0.1.34
+git push origin v0.1.34
+-> Then update the dependancies in the child projects, by searching for: utils@v0.1.34 (-1 [the old version])
+-> Then download the new version: go get -u github.com/ahmedsaleh747/go-creative-utils@v0.1.34
 
 # Git asks for username and password
 -> Use PAT (https://github.com/settings/tokens)
