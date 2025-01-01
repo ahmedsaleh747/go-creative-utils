@@ -48,7 +48,7 @@ func GetUserUsingNameAndPassword(c *gin.Context, user Identity) bool {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return false
 	}
-    db, err := utils.GetDb(c)
+    db, err := GetDb(c)
 	if err != nil {
 		return false
 	}

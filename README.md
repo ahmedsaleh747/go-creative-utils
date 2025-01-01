@@ -77,8 +77,8 @@ GOOS=linux GOARCH=amd64 go build -o build/go-creative-utils
 -> Commit the code
 git tag v0.1.31
 git push origin v0.1.31
--> Then update the dependancies in the child projects, by searching for: utils@v0.1.29
--> Then download the new version: go get -u github.com/ahmedsaleh747/go-creative-utils@v0.1.29
+-> Then update the dependancies in the child projects, by searching for: utils@v0.1.31 (-1 [the old version])
+-> Then download the new version: go get -u github.com/ahmedsaleh747/go-creative-utils@v0.1.31
 
 # Git asks for username and password
 -> Use PAT (https://github.com/settings/tokens)

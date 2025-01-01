@@ -34,7 +34,7 @@ func GetModelRecords[R Model](c *gin.Context, records *[]R, modelTypes []string)
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
 
-    db, err := utils.GetDb(c)
+    db, err := GetDb(c)
 	if err != nil {
 		return false
 	}
@@ -164,7 +164,7 @@ func getModelRecords[R Model](db *gorm.DB, query string, page int, pageSize int,
 func GetRecord[R Model](c *gin.Context, record *R) {
 	id := c.Param("id")
 
-    db, err := utils.GetDb(c)
+    db, err := GetDb(c)
 	if err != nil {
 		return false
 	}
@@ -202,7 +202,7 @@ func CreateRecord[R Model](c *gin.Context, record *R) {
 		return
 	}
 	log.Println("Loaded record from request")
-    db, err := utils.GetDb(c)
+    db, err := GetDb(c)
 	if err != nil {
 		return false
 	}
@@ -245,7 +245,7 @@ func UpdateRecord[R Model](c *gin.Context, record *R) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-    db, err := utils.GetDb(c)
+    db, err := GetDb(c)
 	if err != nil {
 		return false
 	}
@@ -283,7 +283,7 @@ func DeleteRecord[R Model](c *gin.Context, record *R) {
 	if cleanedId, _ := callFunction(record, "CleanId", reflect.ValueOf(id)); cleanedId != "" {
 		id = cleanedId
 	}
-    db, err := utils.GetDb(c)
+    db, err := GetDb(c)
     if err != nil {
         return false
     }
