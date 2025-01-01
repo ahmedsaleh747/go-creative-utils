@@ -34,7 +34,10 @@ func GetModelRecords[R Model](c *gin.Context, records *[]R, modelTypes []string)
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
 
-	db := GetDb(c)
+    db, err := utils.GetDb(c)
+	if err != nil {
+		return false
+	}
 	recordType := reflect.TypeOf(records).Elem().Elem().Name()
 	config := *getModelConfig(recordType)
 	tableName := callFunctionSlice(records, "TableName")
@@ -161,7 +164,10 @@ func getModelRecords[R Model](db *gorm.DB, query string, page int, pageSize int,
 func GetRecord[R Model](c *gin.Context, record *R) {
 	id := c.Param("id")
 
-    db := GetDb(c)
+    db, err := utils.GetDb(c)
+	if err != nil {
+		return false
+	}
 	if err := getRecordById(db, record, id); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
 		return
@@ -196,7 +202,10 @@ func CreateRecord[R Model](c *gin.Context, record *R) {
 		return
 	}
 	log.Println("Loaded record from request")
-	db := GetDb(c)
+    db, err := utils.GetDb(c)
+	if err != nil {
+		return false
+	}
 	if err := createModelRecord(db, record); err != nil {
 		errorCode := http.StatusBadRequest
 		if strings.HasPrefix(err.Error(), "conflict") {
@@ -236,7 +245,10 @@ func UpdateRecord[R Model](c *gin.Context, record *R) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-    db := GetDb(c)
+    db, err := utils.GetDb(c)
+	if err != nil {
+		return false
+	}
 	if err := persistRecord(db, record); err != nil {
 		errorCode := http.StatusBadRequest
 		if strings.HasPrefix(err.Error(), "conflict") {
@@ -271,7 +283,11 @@ func DeleteRecord[R Model](c *gin.Context, record *R) {
 	if cleanedId, _ := callFunction(record, "CleanId", reflect.ValueOf(id)); cleanedId != "" {
 		id = cleanedId
 	}
-	if err := GetDb(c).Delete(record, id).Error; err != nil {
+    db, err := utils.GetDb(c)
+    if err != nil {
+        return false
+    }
+	if err := db.Delete(record, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
 		return
 	}
