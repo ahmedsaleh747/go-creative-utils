@@ -114,10 +114,10 @@ func GetTx(c *gin.Context) (*gorm.DB, error) {
 	return gormTx, nil
 }
 
-func UpdateDb() (c *gin.Context, db *gorm.DB) {
+func UpdateDb(c *gin.Context, db *gorm.DB) {
     c.Set("db", db)
 }
 
-func UpdateTx() (c *gin.Context, tx *gorm.DB) {
+func UpdateTx(c *gin.Context, tx *gorm.DB) {
     c.Set("tx", tx)
 }
