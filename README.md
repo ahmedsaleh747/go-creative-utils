@@ -26,13 +26,13 @@ This includes filtering and sorting from gin url, supports multiple operations p
 ## GetModelRecords
 Same like GetRecords. Moreover, it has the capability to add other models to load during the initial fetch, like dept-name in a users list.
 ## GetAllRecords
-Same like GetRecords but doesn't have gin context, so doesn't have any filtering or sorting, but it loads the PreFetchConditions by reflection.
+Same like GetRecords but without gin context, so doesn't have any filtering or sorting, but it loads the PreFetchConditions by reflection.
 ## GetAllModelRecords
-Same like GetAllRecords but doesn't have gin context, so doesn't have any filtering or sorting, but it loads the PreFetchConditions by reflection. Moreover, it has the capability to add other models to load during the initial fetch, like dept-name in a users list.
+Same like GetAllRecords without gin context, so doesn't have any filtering or sorting, but it loads the PreFetchConditions by reflection. Moreover, it has the capability to add other models to load during the initial fetch, like dept-name in a users list.
 ## GetRecord
 Fetch a record by id from gin context, this also loads the PreFetchConditions by reflection.
 ## GetRecordById
-Same like GetAllRecords but doesn't have gin context.
+Same like GetAllRecords without gin context.
 ## CreateRecord
 Creates a record based on gin context. This methods executed the PreUpdate function on the model by reflection.
 ## CreateModelRecord
