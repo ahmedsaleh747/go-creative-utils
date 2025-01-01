@@ -36,7 +36,7 @@ func GetModelRecords[R Model](c *gin.Context, records *[]R, modelTypes []string)
 
     db, err := GetDb(c)
 	if err != nil {
-		return false
+		return
 	}
 	recordType := reflect.TypeOf(records).Elem().Elem().Name()
 	config := *getModelConfig(recordType)
@@ -166,7 +166,7 @@ func GetRecord[R Model](c *gin.Context, record *R) {
 
     db, err := GetDb(c)
 	if err != nil {
-		return false
+		return
 	}
 	if err := getRecordById(db, record, id); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
@@ -204,7 +204,7 @@ func CreateRecord[R Model](c *gin.Context, record *R) {
 	log.Println("Loaded record from request")
     db, err := GetDb(c)
 	if err != nil {
-		return false
+		return
 	}
 	if err := createModelRecord(db, record); err != nil {
 		errorCode := http.StatusBadRequest
@@ -247,7 +247,7 @@ func UpdateRecord[R Model](c *gin.Context, record *R) {
 	}
     db, err := GetDb(c)
 	if err != nil {
-		return false
+		return
 	}
 	if err := persistRecord(db, record); err != nil {
 		errorCode := http.StatusBadRequest
@@ -285,7 +285,7 @@ func DeleteRecord[R Model](c *gin.Context, record *R) {
 	}
     db, err := GetDb(c)
     if err != nil {
-        return false
+        return
     }
 	if err := db.Delete(record, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
