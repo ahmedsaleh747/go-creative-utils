@@ -38,7 +38,7 @@ func InitDatabaseModels(dsn string, models []interface{}) {
 func DBMiddleware() gin.HandlerFunc {
     return func(c *gin.Context) {
         // Add a scoped DB instance to the context
-        c.Set("db", db.Session(&gorm.Session{}))
+        UpdateDb(c, db.Session(&gorm.Session{}))
         c.Next()
     }
 }
@@ -54,7 +54,7 @@ func TransactionMiddleware() gin.HandlerFunc {
 		}
 
 		// Add transaction to context
-		c.Set("tx", tx)
+		UpdateTx(c, tx)
 
 		// Process request
 		c.Next()
@@ -112,4 +112,12 @@ func GetTx(c *gin.Context) (*gorm.DB, error) {
 	}
 
 	return gormTx, nil
+}
+
+func UpdateDb() (c *gin.Context, db *gorm.DB) {
+    c.Set("db", db)
+}
+
+func UpdateTx() (c *gin.Context, tx *gorm.DB) {
+    c.Set("tx", tx)
 }
