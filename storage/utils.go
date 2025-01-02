@@ -176,7 +176,7 @@ func GetRecord[R Model](c *gin.Context, record *R) {
 }
 
 //Callers don't have gin context
-func GetRecordById[R Model](record *R, id string) error {
+func GetRecordById[R Model](record *R, id string) (err error) {
 	db := GetDbSpecial()
 	return getRecordById(db, record, id)
 }
@@ -191,8 +191,10 @@ func getRecordById[R Model](db *gorm.DB, record *R, id string) error {
 	if condition, _ := callFunction(record, "PreFetchConditions"); condition != "" {
 		db = db.Where(condition)
 	}
+    fmt.Errorf("Can't get record with empty ID")    //TODO remove this line
+	err = db.First(record, id).Error
 	callFunction(record, "PostLoad")
-	return db.First(record, id).Error
+	return
 }
 
 func CreateRecord[R Model](c *gin.Context, record *R) {
