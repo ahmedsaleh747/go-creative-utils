@@ -191,7 +191,6 @@ func getRecordById[R Model](db *gorm.DB, record *R, id string) (err error) {
 	if condition, _ := callFunction(record, "PreFetchConditions"); condition != "" {
 		db = db.Where(condition)
 	}
-	log.Println("Fetching record by id: %s", id)
 	err = db.First(record, id).Error
 	callFunction(record, "PostLoad")
 	return
