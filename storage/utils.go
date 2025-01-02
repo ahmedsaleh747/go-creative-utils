@@ -24,7 +24,7 @@ func GetRecords[R Model](c *gin.Context, records *[]R) {
 	GetModelRecords(c, records, []string{})
 }
 
-//Callers don't have gin context
+// Callers don't have gin context
 func GetAllRecords[R Model](records *[]R) {
 	GetAllModelRecords(records, []string{})
 }
@@ -34,7 +34,7 @@ func GetModelRecords[R Model](c *gin.Context, records *[]R, modelTypes []string)
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
 
-    db, err := GetDb(c)
+	db, err := GetDb(c)
 	if err != nil {
 		return
 	}
@@ -122,7 +122,7 @@ func processFieldFilter(filterOperator string, filterValue string, tableName str
 	return
 }
 
-//Callers don't have gin context
+// Callers don't have gin context
 func GetAllModelRecords[R Model](records *[]R, modelTypes []string) {
 	getModelRecords(GetDbSpecial(), "", 1, 1000, records, modelTypes)
 }
@@ -164,7 +164,7 @@ func getModelRecords[R Model](db *gorm.DB, query string, page int, pageSize int,
 func GetRecord[R Model](c *gin.Context, record *R) {
 	id := c.Param("id")
 
-    db, err := GetDb(c)
+	db, err := GetDb(c)
 	if err != nil {
 		return
 	}
@@ -175,7 +175,7 @@ func GetRecord[R Model](c *gin.Context, record *R) {
 	c.JSON(http.StatusOK, record)
 }
 
-//Callers don't have gin context
+// Callers don't have gin context
 func GetRecordById[R Model](record *R, id string) error {
 	db := GetDbSpecial()
 	return getRecordById(db, record, id)
@@ -191,7 +191,7 @@ func getRecordById[R Model](db *gorm.DB, record *R, id string) (err error) {
 	if condition, _ := callFunction(record, "PreFetchConditions"); condition != "" {
 		db = db.Where(condition)
 	}
-	err = db.First(record, id).Error
+	err = db.Where("id", id).First(record).Error
 	callFunction(record, "PostLoad")
 	return
 }
@@ -203,7 +203,7 @@ func CreateRecord[R Model](c *gin.Context, record *R) {
 		return
 	}
 	log.Println("Loaded record from request")
-    db, err := GetDb(c)
+	db, err := GetDb(c)
 	if err != nil {
 		return
 	}
@@ -219,9 +219,9 @@ func CreateRecord[R Model](c *gin.Context, record *R) {
 	c.JSON(http.StatusOK, record)
 }
 
-//Callers don't have gin context
+// Callers don't have gin context
 func CreateModelRecord[R Model](record *R) error {
-    db := GetDbSpecial()
+	db := GetDbSpecial()
 	return createModelRecord(db, record)
 }
 
@@ -238,7 +238,7 @@ func createModelRecord[R Model](db *gorm.DB, record *R) error {
 
 func UpdateRecord[R Model](c *gin.Context, record *R) {
 	id := c.Param("id")
-    db, err := GetDb(c)
+	db, err := GetDb(c)
 	if err != nil {
 		return
 	}
@@ -262,10 +262,10 @@ func UpdateRecord[R Model](c *gin.Context, record *R) {
 	c.JSON(http.StatusOK, record)
 }
 
-//Callers don't have gin context
+// Callers don't have gin context
 func PersistRecord[R Model](record *R) error {
-    db := GetDbSpecial()
-    return persistRecord(db, record);
+	db := GetDbSpecial()
+	return persistRecord(db, record)
 }
 
 func persistRecord[R Model](db *gorm.DB, record *R) error {
@@ -284,10 +284,10 @@ func DeleteRecord[R Model](c *gin.Context, record *R) {
 	if cleanedId, _ := callFunction(record, "CleanId", reflect.ValueOf(id)); cleanedId != "" {
 		id = cleanedId
 	}
-    db, err := GetDb(c)
-    if err != nil {
-        return
-    }
+	db, err := GetDb(c)
+	if err != nil {
+		return
+	}
 	if err := db.Delete(record, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
 		return
