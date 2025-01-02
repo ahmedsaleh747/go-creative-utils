@@ -176,12 +176,12 @@ func GetRecord[R Model](c *gin.Context, record *R) {
 }
 
 //Callers don't have gin context
-func GetRecordById[R Model](record *R, id string) (err error) {
+func GetRecordById[R Model](record *R, id string) error {
 	db := GetDbSpecial()
 	return getRecordById(db, record, id)
 }
 
-func getRecordById[R Model](db *gorm.DB, record *R, id string) error {
+func getRecordById[R Model](db *gorm.DB, record *R, id string) (err error) {
 	if id == "" {
 		return fmt.Errorf("Can't get record with empty ID")
 	}
